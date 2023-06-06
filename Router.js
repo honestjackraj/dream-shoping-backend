@@ -1,5 +1,5 @@
 const route=require("express").Router()
-const users=require("./usersschema")
+const {User}=require("./usersschema")
 const bcrypt=require("bcrypt")
 const jwt=require("jsonwebtoken")
 const product= require("./productschema")
@@ -12,12 +12,12 @@ const Smallproducte = require("./Smallproducte")
 route.post("/register", async (req, res) => {
   
   try {
-    let alreadyEmail = await users.findOne({ email: req.body.email }); //dbquery
+    let alreadyEmail = await User.findOne({ email: req.body.email }); //dbquery
     if (alreadyEmail) {
       return res.status(400).json("Email exist");
     }
     let pass = await bcrypt.hash(req.body.password, 10);
-    const data = new users({
+    const data = new User({
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       email: req.body.email,
@@ -38,7 +38,7 @@ route.post("/register", async (req, res) => {
  
   route.post("/login", async (req, res) => {
     try {
-      let user = await users.findOne({ email: req.body.email }); //dbquery
+      let user = await User.findOne({ email: req.body.email }); //dbquery
   
       if (!user) {
         return res.status(400).json("please register!");
@@ -88,6 +88,19 @@ route.post("/products",async (req,res)=>{
     res.status(500).send("Wrong credentials...!");
   }
 })
+
+route.get("/details/:id",async(req,res)=>{
+  try {
+      const data = await product.findById(req.params.id);
+      res.status(200).json(data);
+      
+
+  } catch (error) {
+    res.status(500).send("Wrong credentials...!");
+  }
+})
+
+
 
 // Category
 
